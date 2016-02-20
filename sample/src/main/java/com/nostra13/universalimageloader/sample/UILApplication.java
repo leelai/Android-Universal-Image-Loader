@@ -21,10 +21,13 @@ import android.content.Context;
 import android.os.Build;
 import android.os.StrictMode;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-
+import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
+import com.nostra13.universalimageloader.core.decode.ImageDecoder;
+import com.nostra13.universalimageloader.sample.decoder.MyDecoder;
 /**
  * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
  */
@@ -53,8 +56,13 @@ public class UILApplication extends Application {
 		config.denyCacheImageMultipleSizesInMemory();
 		config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
 		config.diskCacheSize(50 * 1024 * 1024); // 50 MiB
-		config.tasksProcessingOrder(QueueProcessingType.LIFO);
+		//config.tasksProcessingOrder(QueueProcessingType.LIFO);
+		config.tasksProcessingOrder(QueueProcessingType.FIFO);
 		config.writeDebugLogs(); // Remove for release app
+		config.memoryCache(new LruMemoryCache(50 * 1024 * 1024));
+		config.memoryCacheSize(50 * 1024 * 1024);
+		config.imageDecoder(new MyDecoder());
+		config.threadPoolSize(Runtime.getRuntime().availableProcessors());
 
 		// Initialize ImageLoader with configuration.
 		ImageLoader.getInstance().init(config.build());
